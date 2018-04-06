@@ -105,23 +105,24 @@ public class MainActivity extends AppCompatActivity {
 
         // Start the queue
         queue.start();
-        JsonArrayRequest jsonArrayRequest= new JsonArrayRequest(url,new Response.Listener<JSONArray>() {
-
-
-            @Override
-            public void onResponse(JSONArray array) {
-                Log.d("app","Response: " + array.toString());
-                for (int i=0;i<array.length();i++){
-                    try {
-                        JSONObject objeto= (JSONObject) array.get(i);
-                        Log.d("app",objeto.toString());
-                        Log.d("app:nombre:",objeto.get("nombre").toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+        JsonArrayRequest jsonArrayRequest= new JsonArrayRequest(
+                url,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray array) {
+                        Log.d("app","Response: " + array.toString());
+                        for (int i=0;i<array.length();i++){
+                            try {
+                                JSONObject objeto= (JSONObject) array.get(i);
+                                Log.d("app",objeto.toString());
+                                Log.d("app:nombre:",objeto.get("nombre").toString());
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }
-            }
-        },new Response.ErrorListener() {
+        ,new Response.ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -135,10 +136,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void requestLaunch() {
 
-        RequestQueue queue;
-
         // Instantiate the cache
-        Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
+        Cache cache = new DiskBasedCache(getCacheDir(),
+                1024 * 1024); // 1MB cap
 
         // Set up the network to use HttpURLConnection as the HTTP client.
         Network network = new BasicNetwork(new HurlStack());
@@ -151,19 +151,19 @@ public class MainActivity extends AppCompatActivity {
 
         //RequestQueue queue = Volley.newRequestQueue(this);
 
+        Response.Listener<String> successListener=new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                // Display the first 500 characters of the response string.
+                Toast.makeText(MainActivity.this,"Response is: "+ response.substring(0,500),Toast.LENGTH_LONG).show();
+                Log.d("app","Response is: "+ response.substring(0,500));
+                //Snackbar.make(toolbar,"Response is: "+ response.substring(0,500) , Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
+            }
+        };
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
-                        Toast.makeText(MainActivity.this,"Response is: "+ response.substring(0,500),Toast.LENGTH_LONG).show();
-                        Log.d("app","Response is: "+ response.substring(0,500));
-                        //Snackbar.make(toolbar,"Response is: "+ response.substring(0,500) , Snackbar.LENGTH_LONG).setAction("Action", null).show();
-
-                    }
-                }, new Response.ErrorListener() {
+                successListener, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(MainActivity.this,"Petition Error:"+error.getLocalizedMessage(),Toast.LENGTH_LONG).show();
@@ -176,7 +176,8 @@ public class MainActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
     public boolean isConnected(){
-        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Activity.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()){
             return true;
